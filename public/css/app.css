@@ -1,0 +1,193 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@300;400;700;800&display=swap');
+
+:root {
+    /* ── Couleurs de fond ── */
+    --ink:      #03060D;   /* fond principal */
+    --ink2:     #070C18;   /* surfaces secondaires */
+    --ink3:     #0D1424;   /* surfaces tertiaires */
+    --ink4:     #131C2E;   /* hover léger */
+
+    /* ── Accents néon ── */
+    --neon:     #00FF88;   /* accent principal vert */
+    --neon2:    #00E5FF;   /* accent secondaire cyan */
+    --neon3:    #AAFF44;   /* neon hover */
+    --amber:    #FFB800;   /* warning / priorité moyenne */
+    --red:      #FF4D4D;   /* danger / priorité haute */
+    --pink:     #FF6EB4;   /* accent décoratif */
+
+    /* ── Transparences neon ── */
+    --dim:      rgba(0, 255, 136, 0.08);
+    --dim2:     rgba(0, 255, 136, 0.14);
+    --dimc:     rgba(0, 229, 255, 0.08);
+    --dima:     rgba(255, 184, 0, 0.08);
+    --dimr:     rgba(255, 77, 77, 0.08);
+
+    /* ── Bordures ── */
+    --border:   rgba(0, 255, 136, 0.16);
+    --borderc:  rgba(0, 229, 255, 0.14);
+    --bord2:    rgba(255, 255, 255, 0.06);
+    --bord3:    rgba(255, 255, 255, 0.04);
+
+    /* ── Texte ── */
+    --text:     #DDE6F0;   /* texte principal */
+    --text2:    #A8B8CC;   /* texte secondaire */
+    --muted:    #5A6B82;   /* texte muet */
+    --muted2:   #2A3545;   /* bordures muettes */
+
+    /* ── Effets ── */
+    --glass:    rgba(255, 255, 255, 0.02);
+    --glow-neon: 0 0 20px rgba(0, 255, 136, 0.35);
+    --glow-cyan: 0 0 20px rgba(0, 229, 255, 0.35);
+
+    /* ── Rayons ── */
+    --r-sm:  4px;
+    --r-md:  8px;
+    --r-lg:  12px;
+    --r-xl:  20px;
+
+    /* ── Transitions ── */
+    --t-fast:   150ms ease;
+    --t-med:    250ms ease;
+    --t-slow:   400ms ease;
+    --t-spring: 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ════════════════════════════════════════════════
+   RESET & BASE
+════════════════════════════════════════════════ */
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+    background: var(--ink);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* ════════════════════════════════════════════════
+   TYPOGRAPHIE
+════════════════════════════════════════════════ */
+.font-display { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; }
+.font-body { font-family: 'Syne', sans-serif; font-weight: 300; }
+.font-mono { font-family: 'DM Mono', monospace; letter-spacing: 0.04em; }
+
+h1, h2, h3, h4, h5, h6 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; line-height: 0.95; }
+
+.text-stroke-neon { color: transparent; -webkit-text-stroke: 1.5px var(--neon); }
+.text-glow-neon { color: var(--neon); text-shadow: 0 0 60px rgba(0, 255, 136, 0.45), 0 0 120px rgba(0, 255, 136, 0.15); }
+.text-gradient {
+    background: linear-gradient(135deg, var(--neon) 0%, var(--neon2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.terminal-cursor::after {
+    content: '|'; color: var(--neon); animation: blink-cursor 1.1s step-end infinite; margin-left: 2px;
+}
+@keyframes blink-cursor { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* ════════════════════════════════════════════════
+   BACKGROUND ELEMENTS
+════════════════════════════════════════════════ */
+.bg-grid {
+    position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background-image:
+        linear-gradient(rgba(0, 255, 136, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 136, 0.02) 1px, transparent 1px);
+    background-size: 68px 68px;
+}
+
+.bg-noise {
+    position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 150px;
+}
+
+.scan-line {
+    position: fixed; left: 0; right: 0; height: 1px;
+    z-index: -1; pointer-events: none; opacity: 0.15;
+    background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 136, 0.8) 50%, transparent 100%);
+    animation: scanline 9s linear infinite;
+}
+@keyframes scanline { 0% { top: -2px; } 100% { top: 100vh; } }
+
+#bg-canvas { position: fixed; inset: 0; z-index: -2; pointer-events: none; opacity: 0.4; }
+
+/* ════════════════════════════════════════════════
+   COMPOSANTS
+════════════════════════════════════════════════ */
+
+/* Nav */
+.bia-nav {
+    position: sticky; top: 0; z-index: 100;
+    height: 72px; padding: 0 40px;
+    background: rgba(3, 6, 13, 0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--bord2);
+    display: flex; align-items: center; justify-content: space-between;
+}
+
+.nav-link {
+    font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.1em; padding: 6px 14px;
+    transition: all var(--t-med); border-radius: var(--r-sm);
+}
+.nav-link:hover { color: var(--neon); background: var(--dim); }
+
+/* Buttons */
+.btn-primary {
+    background: var(--neon); color: var(--ink);
+    padding: 12px 28px; border-radius: var(--r-sm);
+    font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.05em;
+    cursor: pointer; border: none; transition: all var(--t-med);
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.btn-primary:hover { background: var(--neon2); transform: translateY(-2px); box-shadow: var(--glow-neon); }
+
+.btn-ghost {
+    background: transparent; border: 1px solid var(--border); color: var(--neon);
+    padding: 10px 24px; border-radius: var(--r-sm);
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    transition: all var(--t-med);
+}
+.btn-ghost:hover { background: var(--dim); border-color: var(--neon); box-shadow: var(--glow-neon); }
+
+/* Cards */
+.card {
+    background: var(--ink2); border: 1px solid var(--bord2);
+    border-radius: var(--r-lg); transition: all var(--t-med);
+}
+.card:hover { border-color: var(--border); background: var(--ink3); }
+
+/* Inputs */
+.input-terminal {
+    background: var(--ink2); border: 1px solid var(--muted2);
+    color: var(--text); font-family: 'DM Mono', monospace;
+    padding: 14px 18px; border-radius: var(--r-md); outline: none;
+    transition: all var(--t-med);
+}
+.input-terminal:focus { border-color: var(--neon); box-shadow: 0 0 15px rgba(0, 255, 136, 0.1); }
+
+/* ════════════════════════════════════════════════
+   ANIMATIONS
+════════════════════════════════════════════════ */
+@keyframes fade-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.anim-fade-up { animation: fade-up 0.6s ease both; }
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+.anim-fade-in { animation: fade-in 0.5s ease both; }
+
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+
+[x-cloak] { display: none !important; }

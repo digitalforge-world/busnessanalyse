@@ -1,0 +1,70 @@
+/* ── Admin Distinction ── */
+.admin-badge {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    padding: 2px 7px; background: rgba(255, 77, 77, 0.12);
+    border: 1px solid rgba(255, 77, 77, 0.25); color: var(--red);
+    border-radius: var(--r-sm); letter-spacing: 0.1em;
+}
+
+/* ── Stats Highlight ── */
+.admin-stat-card {
+    background: var(--ink2); border: 1px solid var(--bord2);
+    border-radius: var(--r-lg); padding: 22px;
+    display: flex; flex-direction: column;
+    transition: all var(--t-med);
+    position: relative; overflow: hidden;
+}
+.admin-stat-card::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+    background: var(--red); transform: scaleX(0);
+    transition: transform 0.7s ease;
+}
+.admin-stat-card.lit::after { transform: scaleX(1); }
+.admin-stat-card:hover { border-color: rgba(255, 77, 77, 0.3); background: var(--ink3); }
+
+.admin-label {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    color: var(--muted); letter-spacing: 0.14em; text-transform: uppercase;
+    margin-bottom: 8px;
+}
+.admin-value {
+    font-family: 'Bebas Neue', sans-serif; font-size: 32px;
+    letter-spacing: 0.04em; color: #fff; line-height: 1;
+}
+
+/* ── Sections ── */
+.admin-section {
+    background: var(--ink2); border: 1px solid var(--bord2);
+    border-radius: var(--r-xl); padding: 32px;
+    position: relative;
+}
+.admin-section-title {
+    font-family: 'Bebas Neue', sans-serif; font-size: 24px;
+    letter-spacing: 0.05em; color: #fff; margin-bottom: 24px;
+    display: flex; align-items: center; gap: 10px;
+}
+.admin-section-title::before {
+    content: ''; width: 4px; height: 24px; background: var(--red); border-radius: 2px;
+}
+
+/* ── Tables / Lists ── */
+.admin-list-item {
+    display: flex; items-center: center; justify-content: space-between;
+    padding: 12px 0; border-bottom: 1px solid var(--bord3);
+    transition: all var(--t-fast);
+}
+.admin-list-item:last-child { border-bottom: none; }
+.admin-list-item:hover { padding-left: 8px; color: var(--text); }
+
+.admin-val-badge {
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    background: var(--ink3); border: 1px solid var(--muted2);
+    color: var(--text); padding: 4px 10px; border-radius: 4px;
+}
+
+/* ── Chart ── */
+.admin-chart-container {
+    background: var(--ink2); border: 1px solid var(--bord2);
+    border-radius: var(--r-xl); padding: 32px;
+}
