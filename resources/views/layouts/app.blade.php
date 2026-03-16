@@ -251,6 +251,32 @@
                 .forEach(el => obs.observe(el));
         }
 
+        // ── Navigation par Onglets (BIA Terminal) ──
+        function tab(id) {
+            // Boutons
+            document.querySelectorAll('.t-btn').forEach(btn => {
+                btn.classList.toggle('on', btn.dataset.t === id);
+                if (btn.dataset.t === id) {
+                    btn.classList.add('bg-primary-500/5', 'text-primary-500', 'border-primary-500');
+                    btn.classList.remove('text-muted', 'border-transparent');
+                } else {
+                    btn.classList.remove('bg-primary-500/5', 'text-primary-500', 'border-primary-500');
+                    btn.classList.add('text-muted', 'border-transparent');
+                }
+            });
+
+            // Panneaux
+            document.querySelectorAll('.panel').forEach(p => {
+                if (p.id === 'p-' + id) {
+                    p.classList.remove('hidden');
+                    p.classList.add('on');
+                } else {
+                    p.classList.add('hidden');
+                    p.classList.remove('on');
+                }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             initBgCanvas('bg-canvas');
             initNavScroll('main-nav');

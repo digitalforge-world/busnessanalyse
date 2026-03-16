@@ -282,11 +282,6 @@ function app(){
     }
 }
 
-/* ── TABS ── */
-function tab(id){
-    document.querySelectorAll('.t-btn').forEach(b=>b.classList.toggle('on',b.dataset.t===id));
-    document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id==='p-'+id));
-}
 
 /* ── CONCURRENTS ── */
 async function loadConc(slug){
