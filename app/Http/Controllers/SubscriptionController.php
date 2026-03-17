@@ -12,7 +12,8 @@ class SubscriptionController extends Controller
     public function index()
     {
         $plans = config('plans');
-        $user  = auth()->user();
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
         return view('subscription.index', compact('plans', 'user'));
     }
 
@@ -48,7 +49,7 @@ class SubscriptionController extends Controller
             'mode'                 => 'subscription',
             'success_url'          => route('analysis.index') . '?success=1',
             'cancel_url'           => route('subscription.index') . '?cancelled=1',
-            'metadata'             => ['user_id' => auth()->id(), 'plan' => $request->plan],
+            'metadata'             => ['user_id' => (string)auth()->id(), 'plan' => $request->plan],
         ]);
 
         return redirect($session->url);
@@ -60,8 +61,9 @@ class SubscriptionController extends Controller
         $request->validate(['plan' => ['required', 'in:starter,pro,agency']]);
 
         $plan   = config("plans.{$request->plan}");
+        /** @var \App\Models\User $user */
         $user   = auth()->user();
-        $transId = 'bia-' . $user->id . '-' . time();
+        $transId = 'bia-' . ($user->id ?? 'guest') . '-' . time();
 
         $montant = $plan['price_usd'] * 600; // Conversion USD → XOF approximative
 

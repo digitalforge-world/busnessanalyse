@@ -43,9 +43,11 @@ Route::middleware(['auth', 'verified', 'App\Http\Middleware\SetLocale'])->group(
     Route::post('/entreprise/{slug}/whatsapp', [AnalysisController::class, 'envoyerWhatsApp'])
         ->name('analysis.whatsapp');
 
-    // PDF
+    // PDF & EXPORT
     Route::get('/entreprise/{slug}/pdf', [PdfController::class, 'telecharger'])
         ->name('analysis.pdf');
+    Route::get('/entreprise/{slug}/excel', [AnalysisController::class, 'exporterExcel'])
+        ->name('analysis.excel');
 
     // Abonnements
     Route::get('/abonnement', [SubscriptionController::class, 'index'])->name('subscription.index');

@@ -39,6 +39,11 @@
                 ↓ PDF_EXPORT
             </a>
             @endif
+            @if(auth()->user()?->aAcces('pro_exports'))
+            <a href="{{ route('analysis.excel', $company->slug) }}" class="btn-ghost text-[10px] tracking-widest uppercase py-2 px-4 border-muted2/30">
+                ↓ EXCEL_EXPORT
+            </a>
+            @endif
             <a href="{{ route('analysis.show', $company->slug) }}" class="btn-primary text-[10px] tracking-widest uppercase py-2 px-6">
                 RAPPORT_FULL →
             </a>
@@ -82,7 +87,12 @@
 
     {{-- ── TABS ── --}}
     <div class="flex border-b border-muted2/20 bg-ink2 overflow-x-auto no-scrollbar">
-        @foreach(['PROFIL' => 'profil', 'DIGITAL' => 'digital', 'CONSEILS' => 'recos', 'IA_INSIGHT' => 'ia', 'COMPETITION' => 'conc'] as $label => $id)
+        @php 
+            $tabs = ['PROFIL' => 'profil', 'DIGITAL' => 'digital', 'CONSEILS' => 'recos', 'IA_INSIGHT' => 'ia'];
+            if($analyse?->extra_data) $tabs['WEB_AUDIT'] = 'web';
+            $tabs['COMPETITION'] = 'conc';
+        @endphp
+        @foreach($tabs as $label => $id)
         <button class="t-btn px-8 py-4 font-mono text-[10px] tracking-[0.2em] text-muted hover:text-white transition border-b-2 border-transparent transition-all duration-300 {{ $id === 'profil' ? 'on text-primary-500 border-primary-500 bg-primary-500/5' : '' }}" 
             data-t="{{ $id }}" onclick="tab('{{ $id }}')">
             {{ $label }}
@@ -220,41 +230,116 @@
         @endif
     </div>
 
-    {{-- ── PANEL ANALYSE IA ── --}}
+    {{-- ── PANEL IA_INSIGHT ── --}}
     <div class="panel p-8 hidden" id="p-ia">
-        <div class="max-w-3xl space-y-12">
-            <div class="relative">
-                <div class="absolute -left-6 top-0 bottom-0 w-px bg-gradient-to-b from-primary-500 via-muted2/30 to-transparent"></div>
-                <div class="font-mono text-[10px] text-primary-500 uppercase tracking-widest mb-6 px-2">GROQ_LLAMA // DEEP_ANALYSIS</div>
-                <p class="text-xl text-white font-light leading-relaxed italic opacity-90">
-                    {{ $analyse?->analyse_ia ?? 'Traitement de l\'analyse IA en cours...' }}
-                </p>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div class="lg:col-span-2 space-y-12">
+                <div class="relative">
+                    <div class="absolute -left-6 top-0 bottom-0 w-px bg-gradient-to-b from-primary-500 via-muted2/30 to-transparent"></div>
+                    <div class="font-mono text-[10px] text-primary-500 uppercase tracking-widest mb-6 px-2">GROQ_LLAMA // DEEP_ANALYSIS</div>
+                    <p class="text-xl text-white font-light leading-relaxed italic opacity-90">
+                        {{ $analyse?->analyse_ia ?? 'Traitement de l\'analyse IA en cours...' }}
+                    </p>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="font-mono text-[10px] text-muted uppercase tracking-[0.3em]">BENCHMARK_SECTORIEL</div>
+                    <div class="space-y-4">
+                        @foreach([
+                            ['ENTITÉ_ACTUELLE', $company->score_digital, 'bg-primary-500'],
+                            ['MOYENNE_SECTEUR', max(0, $company->score_digital - rand(8,18)), 'bg-muted2'],
+                            ['LEADERS_REGIONAUX', min(100, $company->score_digital + rand(5,15)), 'bg-cyan-500'],
+                        ] as $sc)
+                        <div class="space-y-2">
+                            <div class="flex justify-between font-mono text-[9px] uppercase tracking-widest text-muted">
+                                <span>{{ $sc[0] }}</span>
+                                <span class="text-white">{{ $sc[1] }}%</span>
+                            </div>
+                            <div class="h-1 bg-muted2/10 rounded-full overflow-hidden">
+                                <div class="h-full {{ $sc[2] }} transition-all duration-1000 sc-f" data-w="{{ $sc[1] }}"></div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
             </div>
 
-            <div class="space-y-6">
-                <div class="font-mono text-[10px] text-muted uppercase tracking-[0.3em]">BENCHMARK_SECTORIEL</div>
-                <div class="space-y-4">
-                    @foreach([
-                        ['ENTITÉ_ACTUELLE', $company->score_digital, 'bg-primary-500'],
-                        ['MOYENNE_SECTEUR', max(0, $company->score_digital - rand(8,18)), 'bg-muted2'],
-                        ['LEADERS_REGIONAUX', min(100, $company->score_digital + rand(5,15)), 'bg-cyan-500'],
-                    ] as $sc)
-                    <div class="space-y-2">
-                        <div class="flex justify-between font-mono text-[9px] uppercase tracking-widest text-muted">
-                            <span>{{ $sc[0] }}</span>
-                            <span class="text-white">{{ $sc[1] }}%</span>
+            @if(isset($analyse->extra_data['sentiment']))
+            @php $sent = $analyse->extra_data['sentiment']; @endphp
+            <div class="space-y-8">
+                <div class="p-6 bg-primary-500/5 border border-primary-500/20 rounded-2xl">
+                    <div class="font-mono text-[9px] text-primary-500 uppercase tracking-widest mb-6">SENTIMENT_INDEX</div>
+                    <div class="flex items-end gap-3 mb-6">
+                        <div class="text-5xl font-display text-white">{{ $sent['score'] }}</div>
+                        <div class="mb-2 font-mono text-[10px] {{ $sent['score'] > 0 ? 'text-green-500' : 'text-red-500' }}">{{ strtoupper($sent['label']) }}</div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="text-[11px] text-muted italic leading-relaxed">"{{ $sent['reputation_web'] }}"</div>
+                        <div class="space-y-2">
+                            <div class="font-mono text-[8px] text-muted2 uppercase">Points Clés</div>
+                            @foreach($sent['points_positifs'] ?? [] as $p)
+                                <div class="text-[10px] text-green-400 flex gap-2"><span>+</span> {{ $p }}</div>
+                            @endforeach
                         </div>
-                        <div class="h-1 bg-muted2/10 rounded-full overflow-hidden">
-                            <div class="h-full {{ $sc[2] }} transition-all duration-1000 sc-f" data-w="{{ $sc[1] }}"></div>
+                    </div>
+                </div>
+            </div>
+            @endif
+        </div>
+    </div>
+
+    @if($analyse?->extra_data)
+    <div class="panel p-8 hidden" id="p-web">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            @if(isset($analyse->extra_data['seo_audit']))
+            @php $seo = $analyse->extra_data['seo_audit']; @endphp
+            <div class="space-y-8">
+                <div class="font-mono text-[10px] text-primary-500 uppercase tracking-widest">TECHNICAL_SEO_AUDIT // LIGHTHOUSE</div>
+                <div class="grid grid-cols-2 gap-4">
+                    @foreach(['seo' => 'SEO_SCORE', 'performance' => 'SPEED_PERF', 'accessibility' => 'ACCESS', 'best_practices' => 'PRACTICES'] as $k => $l)
+                    <div class="p-4 bg-muted2/5 border border-muted2/20 rounded-xl">
+                        <div class="font-mono text-[8px] text-muted mb-2">{{ $l }}</div>
+                        <div class="text-3xl font-display {{ ($seo[$k] ?? 0) > 80 ? 'text-green-500' : (($seo[$k] ?? 0) > 50 ? 'text-amber-500' : 'text-red-500') }}">
+                            {{ round($seo[$k] ?? 0) }}%
                         </div>
                     </div>
                     @endforeach
                 </div>
             </div>
-        </div>
-    </div>
+            @endif
 
-    {{-- ── PANEL CONCURRENTS ── --}}
+            @if(isset($analyse->extra_data['tech_stack']))
+            <div class="space-y-8">
+                <div class="font-mono text-[10px] text-cyan-500 uppercase tracking-widest">TECHNOLOGY_STACK // WAPPALYZER</div>
+                <div class="flex flex-wrap gap-3">
+                    @foreach($analyse->extra_data['tech_stack'] as $tech)
+                    <div class="flex items-center gap-2 px-4 py-2 bg-muted2/10 border border-muted2/20 rounded-lg group hover:border-cyan-500/30 transition">
+                        @if(isset($tech['icon']))<img src="https://raw.githubusercontent.com/AliasIO/wappalyzer/master/src/drivers/webextension/images/icons/{{ $tech['icon'] }}" class="w-4 h-4 opacity-50 group-hover:opacity-100 transition">@endif
+                        <span class="font-mono text-[10px] text-white tracking-widest">{{ $tech['name'] }}</span>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+        </div>
+        
+        @if(isset($analyse->extra_data['web_search']))
+        <div class="mt-12 space-y-6">
+            <div class="font-mono text-[10px] text-muted uppercase tracking-widest border-b border-muted2/20 pb-4">REALTIME_SEARCH_RESULTS // SCRAPINGBEE</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @foreach($analyse->extra_data['web_search']['organic_results'] ?? [] as $res)
+                <a href="{{ $res['url'] }}" target="_blank" class="p-4 bg-ink2 border border-muted2/10 rounded-xl hover:border-primary-500/20 transition group">
+                    <div class="text-[10px] text-primary-500 font-mono mb-1 truncate">{{ $res['url'] }}</div>
+                    <div class="text-sm font-display text-white mb-2 group-hover:text-primary-500 transition">{{ $res['title'] }}</div>
+                    <div class="text-[11px] text-muted line-clamp-2 leading-relaxed font-light">{{ $res['snippet'] ?? '' }}</div>
+                </a>
+                @endforeach
+            </div>
+        </div>
+        @endif
+    </div>
+    @endif
+
     <div class="panel p-8 hidden" id="p-conc">
         <div id="conc-zone">
             @if(!$canConc)
@@ -272,5 +357,4 @@
             @endif
         </div>
     </div>
-
 </div>

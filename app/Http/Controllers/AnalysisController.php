@@ -16,7 +16,9 @@ class AnalysisController extends Controller
         private AnalysisService    $analysisService,
         private CompetitorService  $competitorService,
         private SnapshotService    $snapshotService,
+        private \App\Services\ExportService $exportService,
     ) {}
+
 
     public function index(Request $request)
     {
@@ -72,7 +74,7 @@ class AnalysisController extends Controller
     public function analyserConcurrents(Request $request, string $slug): JsonResponse
     {
         $user    = $request->user();
-        $company = Company::where('slug', $slug)->where('user_id', $user->id)->firstOrFail();
+        $company = Company::where('slug', '=', $slug)->where('user_id', '=', $user->id)->firstOrFail();
 
         if (!$user->aAcces('competitors')) {
             return response()->json(['success' => false, 'upgrade' => true], 403);
@@ -91,7 +93,7 @@ class AnalysisController extends Controller
     {
         $request->validate(['numero' => ['required', 'string']]);
         $user    = $request->user();
-        $company = Company::where('slug', $slug)->where('user_id', $user->id)->firstOrFail();
+        $company = Company::where('slug', '=', $slug)->where('user_id', '=', $user->id)->firstOrFail();
 
         if (!$user->aAcces('whatsapp')) {
             return response()->json(['success' => false, 'upgrade' => true], 403);
@@ -115,5 +117,18 @@ class AnalysisController extends Controller
         $user        = $request->user();
 
         return view('analysis.show', compact('company', 'analyse', 'progression', 'user'));
+    }
+
+    public function exporterExcel(Request $request, string $slug)
+    {
+        $user    = $request->user();
+        $company = Company::where('slug', '=', $slug)->where('user_id', '=', $user->id)->firstOrFail();
+        $analyse = $company->derniereAnalyse();
+
+        if (!$user->aAcces('pro_exports')) {
+            return back()->with('error', 'Votre forfait ne permet pas l\'export Excel.');
+        }
+
+        return $this->exportService->exportExcel($company, $analyse);
     }
 }

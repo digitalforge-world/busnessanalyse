@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 class Company extends Model
 {
     protected $fillable = [
-        'user_id', 'nom', 'slug', 'secteur', 'pays', 'langue_detectee',
+        'user_id', 'nom', 'url_site', 'slug', 'secteur', 'pays', 'langue_detectee',
         'description', 'annee_fondation', 'taille',
         'score_digital', 'score_croissance',
         'presence_web', 'points_forts', 'points_faibles', 'opportunites',

@@ -18,7 +18,7 @@ class GroqService
         $this->baseUrl = config('ai.groq.base_url');
     }
 
-    public function analyserCroissance(array $donnees, string $langue = 'fr'): array
+    public function analyserCroissance(array $donnees, string $langue = 'fr', string $context = ''): array
     {
         $json               = json_encode($donnees, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         $langue_instruction = $this->langueInstruction($langue);
@@ -27,6 +27,9 @@ class GroqService
 {$langue_instruction}
 Données de l'entreprise :
 {$json}
+
+Contexte supplémentaire (web) :
+{$context}
 
 Génère un JSON :
 {
@@ -57,6 +60,31 @@ Génère un JSON :
 Règles : 5-7 recommandations, contexte africain/mondial adapté, Mobile Money si pertinent.
 PROMPT;
 
+        return $this->callGroq($prompt);
+    }
+
+    public function analyserSentiment(string $context, string $langue = 'fr'): array
+    {
+        $prompt = <<<PROMPT
+Basé sur ces résultats de recherche Google :
+{$context}
+
+Analyse le sentiment global des clients et du marché. Réponds UNIQUEMENT en JSON :
+{
+  "score": 0, // de -100 à 100
+  "label": "Positif/Neutre/Négatif",
+  "points_positifs": [],
+  "points_negatifs": [],
+  "reputation_web": "Court résumé de la réputation en 2 phrases"
+}
+PROMPT;
+
+        return $this->callGroq($prompt);
+    }
+
+    private function callGroq(string $prompt): array
+    {
+        /** @var \Illuminate\Http\Client\Response $response */
         $response = Http::timeout(45)
             ->withHeaders(['Authorization' => "Bearer {$this->apiKey}"])
             ->post("{$this->baseUrl}/chat/completions", [
@@ -95,13 +123,11 @@ PROMPT;
 
     private function parseJSON(string $texte): array
     {
-        // Supprimer les balises de code markdown
         $texte = preg_replace('/^```json\s*/i', '', $texte);
         $texte = preg_replace('/^```\s*/i', '', $texte);
         $texte = preg_replace('/```\s*$/i', '', $texte);
         $texte = trim($texte);
 
-        // Extraire uniquement le bloc JSON entre { }
         if (preg_match('/\{.*\}/s', $texte, $matches)) {
             $texte = $matches[0];
         }

@@ -11,7 +11,7 @@
         </div>
         <h1 class="text-6xl md:text-7xl font-display text-white tracking-tight">AUDIT_STRATÉGIQUE</h1>
         <p class="text-lg text-muted max-w-2xl mx-auto font-light leading-relaxed italic">
-            Activez la puissance totale de l'IA de renseignement d'affaires. Paiement sécurisé par Carte Bancaire (Paiements Mondiaux) ou Mobile Money (Toutes Zones).
+            Activez la puissance totale de l'IA de renseignement d'affaires. Paiement sécurisé par Carte Bancaire (Paiements Mondiaux).
         </p>
     </div>
 
@@ -63,15 +63,8 @@
                         <form method="POST" action="{{ route('subscription.stripe') }}">
                             @csrf
                             <input type="hidden" name="plan" value="{{ $code }}">
-                            <button type="submit" class="btn-ghost w-full py-4 text-[10px] tracking-[0.2em] border-muted2/30 hover:border-white">
-                                CREDIT_CARD
-                            </button>
-                        </form>
-                        <form method="POST" action="{{ route('subscription.cinetpay') }}">
-                            @csrf
-                            <input type="hidden" name="plan" value="{{ $code }}">
-                            <button type="submit" class="btn-primary w-full py-4 text-[10px] tracking-[0.2em]">
-                                MOBILE_MONEY
+                            <button type="submit" class="btn-primary w-full py-4 text-[10px] tracking-[0.2em] shadow-[0_0_20px_rgba(0,255,136,0.2)]">
+                                PAY_WITH_CARD
                             </button>
                         </form>
                     @else
@@ -99,7 +92,6 @@
                 <div class="font-mono text-[9px] text-muted uppercase tracking-[0.3em]">PAYMENT_SECURITY_PROTOCOL</div>
                 <p class="text-sm text-muted font-light leading-relaxed">
                     Les transactions par carte sont opérées par <strong class="text-white">Stripe</strong> (Protocole SSL 256 bits). 
-                    Le règlement Mobile Money (TMoney, Flooz, Wave, Orange, MTN) est sécurisé par <strong class="text-white">CinetPay</strong>. 
                     Activation immédiate après validation du paiement.
                 </p>
             </div>

@@ -27,9 +27,9 @@ class GeminiService
         }
     }
 
-    public function rechercherEntreprise(string $nom, string $langue = 'fr'): array
+    public function rechercherEntreprise(string $nom, string $langue = 'fr', string $context = ''): array
     {
-        $prompt = $this->construirePrompt($nom, $langue);
+        $prompt = $this->construirePrompt($nom, $langue, $context);
         $body   = $this->construireBody($prompt);
 
         foreach ($this->models as $model) {
@@ -116,10 +116,13 @@ class GeminiService
         ];
     }
 
-    private function construirePrompt(string $nom, string $langue): string
+    private function construirePrompt(string $nom, string $langue, string $context = ''): string
     {
+        $contextPart = $context ? "Voici des informations récentes trouvées sur le web :\n{$context}\n" : "";
+
         return <<<PROMPT
-Analyse l'entreprise "{$nom}". Retourne un JSON structuré basé sur tes connaissances :
+{$contextPart}
+Analyse l'entreprise "{$nom}". Retourne un JSON structuré basé sur tes connaissances et le contexte fourni :
 {
   "nom": "nom officiel",
   "secteur": "secteur d'activité",
@@ -130,6 +133,7 @@ Analyse l'entreprise "{$nom}". Retourne un JSON structuré basé sur tes connais
   "taille": "TPE ou PME ou Grande entreprise",
   "presence_web": {
     "site_web": true,
+    "site_web_url": "URL du site si trouvée, sinon null",
     "facebook": false,
     "instagram": false,
     "linkedin": false,

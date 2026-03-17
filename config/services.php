@@ -40,4 +40,24 @@ return [
         ],
     ],
 
+    'scrapingbee' => [
+        'key' => env('SCRAPINGBEE_API_KEY'),
+    ],
+
+    'serpapi' => [
+        'key' => env('SERPAPI_KEY'),
+    ],
+
+    'wappalyzer' => [
+        'key' => env('WAPPALYZER_API_KEY'),
+    ],
+
+    'lighthouse' => [
+        'key' => env('GOOGLE_LIGHTHOUSE_API_KEY'),
+    ],
+
+    'whatcms' => [
+        'key' => env('WHATCMS_API_KEY'),
+    ],
+
 ];
