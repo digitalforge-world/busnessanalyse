@@ -7,44 +7,65 @@ use Illuminate\Support\Facades\Log;
 
 class ScraperService
 {
-    private string $apiKey;
+    private ?string $scrapingBeeKey;
+    private ?string $serpApiKey;
 
     public function __construct()
     {
-        $this->apiKey = config('services.scrapingbee.key');
+        $this->scrapingBeeKey = config('services.scrapingbee.key');
+        $this->serpApiKey      = config('services.serpapi.key');
     }
 
     /**
-     * Recherche Google via ScrapingBee
+     * Recherche Google via ScrapingBee ou SerpApi
      */
     public function search(string $query, string $lang = 'fr'): array
     {
-        if (empty($this->apiKey)) {
-            Log::warning('ScrapingBee API key missing. Skipping web search.');
-            return [];
-        }
-
-        try {
-            $response = Http::get('https://app.scrapingbee.com/api/v1/google', [
-                'api_key' => $this->apiKey,
-                'search'  => $query,
-                'language'=> $lang,
-                'nb_results' => 5,
-            ]);
-
-            if ($response->failed()) {
-                Log::error('ScrapingBee search failed', [
-                    'status' => $response->status(),
-                    'body'   => $response->body(),
+        // 1. Tenter SerpApi
+        if (!empty($this->serpApiKey)) {
+            try {
+                $response = Http::get('https://serpapi.com/search', [
+                    'api_key' => $this->serpApiKey,
+                    'q'       => $query,
+                    'hl'      => $lang,
+                    'engine'  => 'google',
                 ]);
-                return [];
-            }
 
-            return $response->json();
-        } catch (\Exception $e) {
-            Log::error('ScraperService Error: ' . $e->getMessage());
-            return [];
+                if ($response->successful()) {
+                    $json = $response->json();
+                    // Normalisation pour le frontend (SerpApi utilise 'link' au lieu de 'url')
+                    if (isset($json['organic_results'])) {
+                        foreach ($json['organic_results'] as &$res) {
+                            if (!isset($res['url']) && isset($res['link'])) $res['url'] = $res['link'];
+                        }
+                    }
+                    return $json;
+                }
+            } catch (\Exception $e) {
+                Log::error('SerpApi search failed: ' . $e->getMessage());
+            }
         }
+
+        // 2. Fallback ou Alternative via ScrapingBee
+        if (!empty($this->scrapingBeeKey)) {
+            try {
+                $response = Http::get('https://app.scrapingbee.com/api/v1/google', [
+                    'api_key' => $this->scrapingBeeKey,
+                    'search'  => $query,
+                    'language'=> $lang,
+                    'nb_results' => 5,
+                ]);
+
+                if ($response->successful()) {
+                    return $response->json();
+                }
+            } catch (\Exception $e) {
+                Log::error('ScrapingBee search failed: ' . $e->getMessage());
+            }
+        }
+
+        Log::warning('No Search API keys configured or search failed.');
+        return [];
     }
 
     /**
@@ -59,7 +80,7 @@ class ScraperService
             $apiUrl = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed";
             $response = Http::get($apiUrl, [
                 'url'      => $url,
-                'category' => ['SEO', 'PERFORMANCE', 'ACCESSIBILITY'],
+                'category' => ['SEO', 'PERFORMANCE', 'ACCESSIBILITY', 'BEST_PRACTICES'],
                 'key'      => $apiKey
             ]);
 
@@ -77,7 +98,7 @@ class ScraperService
                 foreach ($detectedTech['details']['items'] as $item) {
                     $techs[] = [
                         'name' => $item['name'] ?? 'Inconnu',
-                        'icon' => null, // Lighthouse ne fournit pas d'icônes
+                        'icon' => null, 
                         'categories' => [$item['category'] ?? 'others']
                     ];
                 }
@@ -119,15 +140,17 @@ class ScraperService
                     $data = $response->json();
                     $res = [];
                     foreach ($data['results'] ?? [] as $t) {
-                        $res[] = ['name' => $t['name'], 'categories' => [$t['category']]];
+                        $res[] = [
+                            'name' => $t['name'] ?? 'Inconnu', 
+                            'categories' => [$t['category'] ?? 'CMS'],
+                            'version' => $t['version'] ?? null
+                        ];
                     }
                     return $res;
                 }
             } catch (\Exception $e) {}
         }
 
-        // 3. Fallback : Utiliser les données déjà récupérées par Lighthouse lors de l'audit SEO
-        // Ou relancer un mini audit Lighthouse si besoin (mais coûteux en temps)
         return [];
     }
 }

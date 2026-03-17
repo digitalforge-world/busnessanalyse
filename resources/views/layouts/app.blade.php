@@ -61,12 +61,17 @@
     <div class="scan-line"></div>
 
     {{-- Navigation --}}
-    <nav class="bia-nav" id="main-nav">
-        <div class="flex items-center gap-8">
-            <a href="{{ route('analysis.index') }}" class="nav-logo">
+    <nav class="bia-nav" id="main-nav" x-data="{ mobileMenu: false }">
+        <div class="flex items-center justify-between w-full lg:w-auto gap-4 lg:gap-8">
+            <a href="{{ route('analysis.index') }}" class="nav-logo shrink-0">
                 <div class="nav-logo-dot"></div>
-                BIA <span class="opacity-40 font-light">SYSTEM</span>
+                BIA <span class="hidden sm:inline opacity-40 font-light">SYSTEM</span>
             </a>
+
+            {{-- Hamburger Mobile --}}
+            <button class="lg:hidden p-2 text-primary-500" @click="mobileMenu = !mobileMenu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path x-show="!mobileMenu" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path><path x-show="mobileMenu" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="6 18L18 6M6 6l12 12"></path></svg>
+            </button>
 
             <div class="hidden lg:flex items-center gap-2">
                 <a href="{{ route('analysis.index') }}" class="nav-link {{ request()->routeIs('analysis.index') ? 'active' : '' }}">Analyses</a>
@@ -80,7 +85,7 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-6">
+        <div class="hidden lg:flex items-center gap-6">
             {{-- Langue --}}
             <div class="hidden md:flex gap-3">
                 @foreach(['fr' => 'FR', 'en' => 'EN'] as $code => $label)
@@ -112,9 +117,25 @@
                 </div>
             @endauth
         </div>
+
+        {{-- Mobile Menu --}}
+        <div x-show="mobileMenu" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="absolute top-16 left-0 right-0 bg-ink border-b border-border p-6 flex flex-col gap-4 lg:hidden z-50">
+            <a href="{{ route('analysis.index') }}" class="nav-link text-center px-4 py-3 bg-white/5 rounded">Analyses</a>
+            <a href="{{ route('subscription.index') }}" class="nav-link text-center px-4 py-3 bg-white/5 rounded">Tarifs</a>
+            @auth
+                <a href="{{ route('dashboard') }}" class="nav-link text-center px-4 py-3 bg-white/5 rounded">Mon Espace</a>
+                <form method="POST" action="{{ route('logout') }}" class="w-full">
+                    @csrf
+                    <button type="submit" class="w-full py-3 font-mono text-xs text-red-400 bg-red-500/10 rounded">LOGOUT</button>
+                </form>
+            @else
+                <a href="{{ route('login') }}" class="nav-link text-center px-4 py-3 bg-white/5 rounded">Connexion</a>
+                <a href="{{ route('register') }}" class="nav-cta text-center py-3">S'INSCRIRE</a>
+            @endauth
+        </div>
     </nav>
 
-    <main class="relative z-10 max-w-7xl mx-auto px-6 py-12">
+    <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12">
         @if(session('message'))
         <div class="anim-fade-up mb-10 p-5 bg-dim border border-border text-primary-500 rounded-lg flex items-center gap-4">
             <div class="w-8 h-8 rounded bg-primary-500/10 flex items-center justify-center font-mono text-xs">!</div>
