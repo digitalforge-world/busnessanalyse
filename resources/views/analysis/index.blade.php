@@ -10,55 +10,59 @@
      ═══════════════════════════════════════════════════════ --}}
 <style>
 /* ── SEARCH TERMINAL ── */
-.srch-wrap { animation: fade-up 0.7s 0.3s ease both; }
+.srch-wrap { animation: fade-up 0.7s 0.3s ease both; max-width: 850px; }
 .srch-lbl {
-    font-family:'DM Mono',monospace; font-size:10px; color:var(--neon);
-    letter-spacing:.14em; margin-bottom:8px;
-    display:flex; align-items:center; gap:5px;
+    font-family:'DM Mono',monospace; font-size:9px; color:var(--neon);
+    letter-spacing:.25em; margin-bottom:12px;
+    display:flex; align-items:center; gap:8px; opacity: 0.8;
 }
 .srch-lbl::before { content:'>'; animation:blink 1.1s step-end infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
 
 .srch-box {
-    display:flex; align-items:center; max-width:700px;
-    background:var(--ink2); border:1px solid var(--border); border-radius:4px;
-    overflow:hidden; transition:all .3s;
-    box-shadow: 0 0 0 0 rgba(0,255,136,0);
+    display:flex; align-items:stretch;
+    background:rgba(7, 12, 24, 0.6); border:1px solid var(--border); border-radius:12px;
+    overflow:hidden; transition:all .4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
 }
 .srch-box:focus-within {
     border-color:var(--neon);
-    box-shadow: 0 0 0 3px rgba(0,255,136,0.1), 0 0 40px rgba(0,255,136,.07);
+    box-shadow: 0 0 0 4px rgba(0,255,136,0.05), 0 0 60px rgba(0,255,136,.12);
+    transform: translateY(-2px);
 }
 .srch-pre {
-    padding: 0 16px; height:56px;
+    padding: 0 20px;
     display:flex; align-items:center;
-    font-family:'DM Mono',monospace; font-size:13px; color:var(--neon);
-    border-right:1px solid var(--muted2);
-    background:rgba(0,255,136,.045);
+    font-family:'DM Mono',monospace; font-size:12px; color:var(--muted);
+    border-right:1px solid var(--border);
+    background:rgba(255,255,255,.02);
     white-space:nowrap; user-select:none; letter-spacing:.05em;
 }
 .srch-inp {
     flex:1; background:transparent; border:none; outline:none;
-    color:var(--text); font-size:15px; font-family:'DM Mono',monospace;
-    padding:0 18px; height:56px; letter-spacing:.02em; caret-color:var(--neon);
+    color:var(--text); font-size:16px; font-family:'DM Mono',monospace;
+    padding:18px 24px; min-height:64px; letter-spacing:.02em; caret-color:var(--neon);
 }
-.srch-inp::placeholder { color:var(--muted2); }
+.srch-inp::placeholder { color:var(--muted2); font-size:14px; }
+
 .srch-btn {
-    height:56px; padding:0 32px;
-    background:var(--neon); color:var(--ink);
-    border:none; font-family:'Bebas Neue',sans-serif; font-size:18px;
-    letter-spacing:.1em; cursor:pointer; transition:all .2s;
-    display:flex; align-items:center; gap:7px; white-space:nowrap;
+    padding:0 36px;
+    background: var(--neon); color:var(--ink);
+    border:none; font-family:'Bebas Neue',sans-serif; font-size:20px;
+    letter-spacing:.08em; cursor:pointer; transition:all .3s;
+    display:flex; align-items:center; justify-content:center; gap:10px; white-space:nowrap;
     position:relative; overflow:hidden;
 }
 .srch-btn::after {
     content:''; position:absolute; inset:0;
-    background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);
-    transform:translateX(-100%); transition:transform .45s;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);
+    transform:translateX(-100%); transition:transform .6s;
 }
 .srch-btn:hover::after { transform:translateX(100%); }
-.srch-btn:hover { background:var(--cyan); }
-.srch-btn:disabled { background:var(--muted2); cursor:not-allowed; }
+.srch-btn:hover { background:var(--neon2); box-shadow: 0 0 30px rgba(0,229,255,0.4); }
+.srch-btn:active { transform: scale(0.98); }
+.srch-btn:disabled { background:var(--muted2); color: var(--muted); cursor:not-allowed; }
 .srch-btn:disabled::after { display:none; }
 
 /* Progress bar de recherche */
@@ -82,23 +86,25 @@
 
 /* Animation Entités */
 .hero-eye {
-    display: inline-flex; align-items: center; gap: 10px;
-    font-family:'DM Mono',monospace; font-size:10px; color:var(--neon);
-    letter-spacing:.16em; text-transform:uppercase; margin-bottom:28px;
-    padding: 6px 14px; border: 1px solid var(--border);
-    border-radius: 2px; background: var(--dim);
+    display: inline-flex; align-items: center; gap: 12px;
+    font-family:'DM Mono',monospace; font-size:9px; color:var(--neon);
+    letter-spacing:.2em; text-transform:uppercase; margin-bottom:32px;
+    padding: 8px 18px; border: 1px solid rgba(0,255,136,0.2);
+    border-radius: 100px; background: rgba(0,255,136,0.03);
     animation: fade-up 0.6s ease both;
 }
-.eye-pulse { width:8px; height:8px; border-radius:50%; background:var(--neon); box-shadow:0 0 8px var(--neon); }
+.eye-pulse { width:10px; height:10px; border-radius:50%; background:var(--neon); box-shadow:0 0 12px var(--neon); animation: pulse-glow 2s infinite; }
+@keyframes pulse-glow { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.9); } }
 
 .hero-h1 {
     font-family:'Bebas Neue',sans-serif;
-    font-size: clamp(56px, 9vw, 118px);
-    line-height: .91; letter-spacing: .02em; color: #fff; margin-bottom: 24px;
+    font-size: clamp(48px, 10vw, 110px);
+    line-height: 0.9; letter-spacing: -0.01em; color: #fff; margin-bottom: 28px;
     animation: fade-up 0.7s 0.1s ease both;
 }
-.hero-h1 .stroke { -webkit-text-stroke: 1.5px var(--neon); color: transparent; }
-.hero-h1 .glow   { color:var(--neon); text-shadow:0 0 60px rgba(0,255,136,.35); }
+.hero-h1 .stroke { -webkit-text-stroke: 1px rgba(255,255,255,0.2); color: transparent; transition: -webkit-text-stroke 0.3s; }
+.hero-h1:hover .stroke { -webkit-text-stroke: 1px var(--neon); }
+.hero-h1 .glow   { color:var(--neon); text-shadow:0 0 40px rgba(0,255,136,0.4); }
 
 .hero-p {
     font-size:16px; color:var(--muted); max-width:540px; line-height:1.75;
@@ -131,50 +137,38 @@
 </style>
 
 {{-- ═══════ PAGE CONTENT ═══════ --}}
-<div class="space-y-16">
-
-    {{-- FEATURES MINI BAR --}}
-    <div class="flex flex-wrap gap-8 items-center justify-start border-b border-muted2/20 pb-8 overflow-x-auto no-scrollbar">
-        @foreach([['Gemini','Renseignement web'],['Groq','Reasoning Engine'],['PDF','Output Stratégique'],['Concours','Benchmarking']] as $f)
-        <div class="flex items-center gap-3 whitespace-nowrap">
-            <div class="w-1.5 h-1.5 rounded-full bg-primary-500"></div>
-            <div class="font-mono text-[10px] tracking-widest text-muted"><b class="text-white">{{ $f[0] }}</b> · {{ $f[1] }}</div>
-        </div>
-        @endforeach
-    </div>
-
-    {{-- HERO + SEARCH --}}
-    <section class="max-w-5xl" x-data="app()" x-cloak>
-        <div class="hero-eye mt-4">
-            <div class="eye-pulse"></div>Standard Mondial d'Intelligence Commerciale
-        </div>
-
-        <h1 class="hero-h1">
-            <span>ANALYSEZ</span>
-            <span class="stroke">NIMPORTE QUELLE</span>
-            <span class="glow">CIBLE BUSINESS</span>
-        </h1>
-
-        <p class="hero-p">
-            Propulsé par <b>Deep Reasoning Models</b>. Scannez n'importe quelle entité économique mondiale en temps réel pour générer une due diligence complète et des recommandations stratégiques instantanées.
-        </p>
+    {{-- ESPACE DE TRAVAIL TERMINAL --}}
+    <div class="flex flex-col items-center justify-center min-h-[40vh] py-12" x-data="app()" x-cloak>
+        
 
         {{-- TERMINAL DE RECHERCHE --}}
-        <div class="srch-wrap">
-            <div class="srch-lbl uppercase tracking-[0.2em] text-[10px] mb-4">INITIALISER LE SCAN / NOM_ENTREPRISE</div>
-            <div class="srch-box">
-                <div class="srch-pre font-mono">BIA_QUERY @ login_</div>
-                <input class="srch-inp" x-model="q" @keydown.enter="run"
-                       placeholder="Ex: Apple Inc, Tesla, LVMH, Samsung..."
-                       autocomplete="off" spellcheck="false">
-                <button class="srch-btn" @click="run" :disabled="loading||q.trim().length<2">
-                    <span x-show="!loading">LANCER LE SCAN</span>
+        <div class="srch-wrap w-full">
+            <div class="srch-lbl uppercase opacity-60">SYSTEM_READY // WAITING_FOR_INPUT</div>
+            
+            <div class="srch-box flex-col sm:flex-row group">
+                <div class="flex flex-1 items-center min-w-0">
+                    <div class="srch-pre hidden md:flex font-mono">BIA_QUERY @ login_</div>
+                    <input class="srch-inp" x-model="q" @keydown.enter="run"
+                           placeholder="Saisissez un nom d'entreprise ou site web..."
+                           autocomplete="off" spellcheck="false">
+                </div>
+                <button class="srch-btn py-4 sm:py-0" @click="run" :disabled="loading||q.trim().length<2">
+                    <span x-show="!loading" class="flex items-center gap-3">
+                        LANCER LE SCAN 
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </span>
                     <div x-show="loading" class="flex gap-1.5">
-                        <span class="w-1 h-1 bg-ink rounded-full animate-bounce"></span>
-                        <span class="w-1 h-1 bg-ink rounded-full animate-bounce [animation-delay:0.2s]"></span>
-                        <span class="w-1 h-1 bg-ink rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                        <span class="w-1.5 h-1.5 bg-ink rounded-full animate-bounce"></span>
+                        <span class="w-1.5 h-1.5 bg-ink rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                        <span class="w-1.5 h-1.5 bg-ink rounded-full animate-bounce [animation-delay:0.4s]"></span>
                     </div>
                 </button>
+            </div>
+
+            {{-- Mobile hint --}}
+            <div class="mt-4 flex items-center gap-3 px-2 sm:hidden">
+                <div class="w-1 h-1 rounded-full bg-muted"></div>
+                <p class="font-mono text-[9px] text-muted tracking-wider uppercase">Entrez une URL ou un nom d'entité légale</p>
             </div>
 
             <div x-show="loading" x-transition class="prog-wrap">
@@ -188,7 +182,7 @@
 
             <div x-show="err" x-transition class="mt-4 p-4 border border-red-500/30 bg-red-500/5 rounded-lg font-mono text-xs text-red-500" x-text="err"></div>
         </div>
-    </section>
+    </div>
 
     {{-- ZONE RÉSULTATS --}}
     <div id="result-zone"></div>
